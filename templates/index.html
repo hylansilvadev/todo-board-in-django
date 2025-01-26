@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script defer src="{% static 'js/script.js' %}"></script>
+    <script defer>
+        const updateTaskStatusUrl = "{% url 'update_task_status' %}";
+        const updateTaskUrl = "{% url 'update_task' %}";
+        const deleteTaskUrl = "{% url 'delete_task' %}";
+    </script>
+</head>
+
+<body>
+    <div class="kanban-board">
+        <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3>Para Fazer</h3>
+            <div class="kanban-add-task" onclick="openModal()">+ Adicionar Nova Tarefa</div>
+            {% for task in itens %}
+            {% if task.status == 'O' %}
+            <div class="kanban-task" draggable="true" ondragstart="drag(event)" id="task-{{ task.id }}"
+                onclick="openUpdateModal('{{ task.id }}', '{{ task.title }}', '{{ task.description }}', '{{ task.status }}')">
+                <h2>{{ task.title }}</h2>
+                <p>{{ task.description }}</p>
+                <p>created at: {{ task.created_at }}</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3>Em Progresso</h3>
+            <div class="kanban-add-task" onclick="openModal()">+ Adicionar Nova Tarefa</div>
+            {% for task in itens %}
+            {% if task.status == 'N' %}
+            <div class="kanban-task" draggable="true" ondragstart="drag(event)" id="task-{{ task.id }}"
+                onclick="openUpdateModal('{{ task.id }}', '{{ task.title }}', '{{ task.description }}', '{{ task.status }}')">
+                <h2>{{ task.title }}</h2>
+                <p>{{ task.description }}</p>
+                <p>created at: {{ task.created_at }}</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3>Feito</h3>
+            <div class="kanban-add-task" onclick="openModal()">+ Adicionar Nova Tarefa</div>
+            {% for task in itens %}
+            {% if task.status == 'C' %}
+            <div class="kanban-task" draggable="true" ondragstart="drag(event)" id="task-{{ task.id }}"
+                onclick="openUpdateModal('{{ task.id }}', '{{ task.title }}', '{{ task.description }}', '{{ task.status }}')">
+                <h2>{{ task.title }}</h2>
+                <p>{{ task.description }}</p>
+                <p>created at: {{ task.created_at }}</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Nova Tarefa</h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'add_task' %}">
+                    {% csrf_token %}
+                    <input type="text" name="title" placeholder="Título" required>
+                    <textarea name="description" placeholder="Descrição" rows="4" required></textarea>
+                    <select name="status" required>
+                        <option value="O">Para Fazer</option>
+                        <option value="N">Em Progresso</option>
+                        <option value="C">Feito</option>
+                    </select>
+                    <button type="submit">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Atualização -->
+    <div id="updateTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Atualizar Tarefa</h2>
+                <span class="modal-close" onclick="closeUpdateModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="updateTaskForm" method="POST" action="{% url 'update_task' %}">
+                    {% csrf_token %}
+                    <input type="text" id="updateTitle" name="title" placeholder="título" required>
+                    <textarea id="updateDescription" name="description" placeholder="descrição" rows="4" required></textarea>
+                    <select id="updateStatus" name="status" required>
+                        <option value="O">Para Fazer</option>
+                        <option value="N">Em Progresso</option>
+                        <option value="C">Feito</option>
+                    </select>
+                    <div class="modal-footer">
+                        <button type="submit">Salvar</button>
+                        <button type="button" id="deleteTaskButton" onclick="deleteTask()">Deletar Tarefa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
