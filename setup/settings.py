@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['todo-board-in-django.onrender.com']
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://todo-board-in-django.onrender.com",
+]
 
 # Application definition
 
